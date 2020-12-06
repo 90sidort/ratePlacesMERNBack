@@ -27,11 +27,7 @@ placesRouter.post(
 
 placesRouter.patch(
   "/:pid",
-  [
-    check("title").not().isEmpty(),
-    check("description").isLength(5),
-    check("address").not().isEmpty(),
-  ],
+  [check("title").not().isEmpty(), check("description").isLength(5)],
   updatePlace
 );
 

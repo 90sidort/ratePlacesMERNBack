@@ -1,61 +1,73 @@
-const { v4: uuidv4 } = require("uuid");
 const { validationResult } = require("express-validator");
 
+const User = require("../models/user.model");
 const HttpError = require("../models/http-error");
-const { USERS } = require("../mocks");
 
-const getUsersList = (req, res, next) => {
-  if (USERS) {
-    return res.status(200).json({ users: USERS });
-  } else {
-    return next(new HttpError("No user found.", 404));
+const getUsersList = async (req, res, next) => {
+  try {
+    const users = await User.find();
+    return res
+      .status(200)
+      .json({ users: users.map((user) => user.toObject({ getters: true })) });
+  } catch (e) {
+    return next(new HttpError("Server error.", 500));
   }
 };
 
-const getUser = (req, res, next) => {
-  const user = USERS.find((u) => u.id === req.params.uid);
-  if (user) {
-    return res.status(200).json({ user });
-  } else {
-    return next(new HttpError("This user does not exist.", 404));
+const getUser = async (req, res, next) => {
+  try {
+    const user = await User.findOne({ _id: req.params.uid });
+    if (!user) {
+      return next(new HttpError("User with this id does not exist.", 404));
+    } else {
+      return res.status(200).json({ user: user.toObject({ getters: true }) });
+    }
+  } catch (e) {
+    return next(new HttpError("Server error.", 500));
   }
 };
 
-const signup = (req, res, next) => {
+const signup = async (req, res, next) => {
   const { errors } = validationResult(req);
-  console.log(errors);
   if (errors.length > 0) {
     return next(new HttpError("Invalid inputes, please check your data.", 404));
   }
-
-  let alreadyExists = false;
-  const { name, password, email } = req.body;
-
-  USERS.forEach((user) => {
-    if (user.email === email) {
-      alreadyExists = true;
-      return next(new HttpError("User already exists.", 404));
+  const { name, password, email, image } = req.body;
+  try {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return next(new HttpError("User already exists.", 500));
+    } else {
+      const newUser = await new User({
+        name,
+        email,
+        image: "https://www.wykop.pl/cdn/c3397992/koroluk_StE6gbt0eO,q150.jpg",
+        password,
+        places: [],
+      });
+      await newUser.save();
+      return res
+        .status(201)
+        .json({ user: newUser.toObject({ getters: true }) });
     }
-  });
-
-  if (!alreadyExists) {
-    const newUser = { id: uuidv4(), name, password, email };
-    USERS.push(newUser);
-    return res.status(201).json({ user: newUser });
+  } catch (e) {
+    return next(new HttpError("Signup failed.", 500));
   }
 };
 
-const login = (req, res, next) => {
-  if (req.body.email && req.body.password) {
-    const { email, password } = req.body;
-    USERS.forEach((user) => {
-      if (user.email === email && user.password === password) {
-        return res.status(200).send({ user });
-      }
-    });
-    return next(new HttpError("Incorrect user data.", 404));
-  } else {
-    return next(new HttpError("Provide correct user data.", 404));
+const login = async (req, res, next) => {
+  const { email, password } = req.body;
+  try {
+    const existingUser = await User.findOne({ email });
+    if (!existingUser || existingUser.password !== password) {
+      return next(
+        new HttpError("User does not exists or incorrect password.", 401)
+      );
+    } else {
+      return res.status(200).json({ message: "Logged in!" });
+    }
+  } catch (e) {
+    return next(new HttpError("Login failed.", 500));
   }
 };
 

@@ -1,8 +1,7 @@
 const axios = require("axios");
-const Open_Geocoding_API = require("../config");
-const HttpError = require("../models/http-error");
+const { Open_Geocoding_API } = require("../config");
 
-const getLatLong = async (addres, next) => {
+const getLatLong = async (addres) => {
   const res = await axios.get(
     `http://open.mapquestapi.com/geocoding/v1/address?key=${Open_Geocoding_API}&location=${addres}`
   );
