@@ -17,7 +17,7 @@ userRouters.get("/:uid", getUser);
 userRouters.post(
   "/signup",
   [
-    check("password").not().isEmpty(),
+    check("password").isLength(6),
     check("name").not().isEmpty(),
     check("email").normalizeEmail().isEmail(),
   ],
