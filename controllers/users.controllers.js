@@ -64,7 +64,10 @@ const login = async (req, res, next) => {
         new HttpError("User does not exists or incorrect password.", 401)
       );
     } else {
-      return res.status(200).json({ message: "Logged in!" });
+      return res.status(200).json({
+        message: "Logged in!",
+        user: existingUser.toObject({ getters: true }),
+      });
     }
   } catch (e) {
     return next(new HttpError("Login failed.", 500));
