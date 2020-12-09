@@ -9,13 +9,9 @@ const User = require("../models/user.model");
 const getPlacesByUser = async (req, res, next) => {
   try {
     const places = await Place.find({ creator: req.params.uid });
-    if (places.length === 0) {
-      return next(new HttpError("This user has no places added.", 404));
-    } else {
-      return res.status(200).json({
-        places: places.map((place) => place.toObject({ getters: true })),
-      });
-    }
+    return res.status(200).json({
+      places: places.map((place) => place.toObject({ getters: true })),
+    });
   } catch (e) {
     return next(new HttpError("Server error.", 500));
   }
