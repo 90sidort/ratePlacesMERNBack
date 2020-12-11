@@ -1,5 +1,6 @@
 const express = require("express");
 const { check } = require("express-validator");
+const fileUpload = require("../middleware/file_upload");
 
 const {
   getUsersList,
@@ -16,6 +17,7 @@ userRouters.get("/:uid", getUser);
 
 userRouters.post(
   "/signup",
+  fileUpload.single("image"),
   [
     check("password").isLength(6),
     check("name").not().isEmpty(),
