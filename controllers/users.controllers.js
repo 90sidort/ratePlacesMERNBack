@@ -32,7 +32,7 @@ const signup = async (req, res, next) => {
   if (errors.length > 0) {
     return next(new HttpError("Invalid inputes, please check your data.", 404));
   }
-  const { name, password, email, image } = req.body;
+  const { name, password, email } = req.body;
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -41,7 +41,7 @@ const signup = async (req, res, next) => {
       const newUser = await new User({
         name,
         email,
-        image: "https://www.wykop.pl/cdn/c3397992/koroluk_StE6gbt0eO,q150.jpg",
+        image: req.file.path,
         password,
         places: [],
       });

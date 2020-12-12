@@ -1,4 +1,6 @@
 const express = require("express");
+const fs = require("fs");
+const path = require("path");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
@@ -20,11 +22,17 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use("/uploads/images", express.static(path.join("uploads", "images")));
 app.use("/api/places", placesRouter);
 app.use("/api/users", userRouters);
 
 app.use(errorController);
 app.use((error, req, res, next) => {
+  if (req.file) {
+    fs.unlink(req.file.path, (error) => {
+      console.log(error);
+    });
+  }
   if (res.headerSent) {
     return next(error);
   }

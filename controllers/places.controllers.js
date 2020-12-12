@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { validationResult } = require("express-validator");
+const fs = require("fs");
 
 const HttpError = require("../models/http-error");
 const { getLatLong } = require("../utils/location");
@@ -35,15 +36,14 @@ const createPlace = async (req, res, next) => {
   if (errors.length > 0) {
     return next(new HttpError("Invalid inputes, please check your data.", 422));
   }
-  const { title, description, address, creator, image } = await req.body;
+  const { title, description, address, creator } = await req.body;
   const coordinates = await getLatLong(address);
   if (coordinates === "Error") {
     return next(new HttpError("Invalid address, please check your data.", 422));
   }
   const createdPlace = new Place({
     title,
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/1/10/Empire_State_Building_%28aerial_view%29.jpg",
+    image: req.file.path,
     description,
     address,
     creator,
@@ -91,8 +91,10 @@ const updatePlace = async (req, res, next) => {
 };
 
 const deletePlace = async (req, res, next) => {
+  let imagePath;
   try {
     const place = await Place.findById(req.params.pid).populate("creator");
+    imagePath = place.image;
     if (!place) {
       return next(new HttpError("No places with this id exist.", 500));
     } else {
@@ -102,11 +104,14 @@ const deletePlace = async (req, res, next) => {
       place.creator.places.pull(place);
       await place.creator.save({ session });
       await session.commitTransaction();
-      return res.status(200).json({ message: "Place has been deleted." });
     }
   } catch (e) {
     return next(new HttpError("Server error.", 500));
   }
+  fs.unlink(imagePath, (error) => {
+    console.log(error);
+  });
+  return res.status(200).json({ message: "Place has been deleted." });
 };
 
 module.exports = {
