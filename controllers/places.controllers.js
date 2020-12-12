@@ -82,6 +82,7 @@ const updatePlace = async (req, res, next) => {
     } else {
       place.title = title;
       place.description = description;
+      place.image = req.file ? req.file.path : place.image;
       await place.save();
       return res.status(200).json({ place: place.toObject({ getters: true }) });
     }

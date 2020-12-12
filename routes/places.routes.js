@@ -30,6 +30,7 @@ placesRouter.post(
 
 placesRouter.patch(
   "/:pid",
+  fileUpload.single("image"),
   [check("title").not().isEmpty(), check("description").isLength(5)],
   updatePlace
 );
