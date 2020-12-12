@@ -108,9 +108,11 @@ const deletePlace = async (req, res, next) => {
   } catch (e) {
     return next(new HttpError("Server error.", 500));
   }
-  fs.unlink(imagePath, (error) => {
-    console.log(error);
-  });
+  if (imagePath !== "placeholder") {
+    fs.unlink(imagePath, (error) => {
+      console.log(error);
+    });
+  }
   return res.status(200).json({ message: "Place has been deleted." });
 };
 
