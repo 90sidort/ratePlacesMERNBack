@@ -1,4 +1,6 @@
 const { validationResult } = require("express-validator");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const User = require("../models/user.model");
 const HttpError = require("../models/http-error");
@@ -38,19 +40,28 @@ const signup = async (req, res, next) => {
     if (existingUser) {
       return next(new HttpError("User already exists.", 500));
     } else {
+      const hashedPassword = await bcrypt.hash(password, 12);
       const newUser = await new User({
         name,
         email,
         image: req.file.path,
-        password,
+        password: hashedPassword,
         places: [],
       });
       await newUser.save();
+
+      const token = jwt.sign(
+        { userId: newUser.id, email: newUser.email },
+        "this_is_the_number_2137",
+        { expiresIn: "1h" }
+      );
+
       return res
         .status(201)
-        .json({ user: newUser.toObject({ getters: true }) });
+        .json({ userId: newUser.id, email: newUser.email, token: token });
     }
   } catch (e) {
+    console.log(e);
     return next(new HttpError("Signup failed.", 500));
   }
 };
@@ -59,15 +70,27 @@ const login = async (req, res, next) => {
   const { email, password } = req.body;
   try {
     const existingUser = await User.findOne({ email });
-    if (!existingUser || existingUser.password !== password) {
-      return next(
-        new HttpError("User does not exists or incorrect password.", 401)
-      );
+    if (!existingUser) {
+      return next(new HttpError("User does not exists.", 401));
     } else {
-      return res.status(200).json({
-        message: "Logged in!",
-        user: existingUser.toObject({ getters: true }),
-      });
+      const isValidPassword = await bcrypt.compare(
+        password,
+        existingUser.password
+      );
+      if (!isValidPassword) {
+        return next(new HttpError("Incorrect password!"));
+      } else {
+        const token = jwt.sign(
+          { userId: existingUser.id, email: existingUser.email },
+          "this_is_the_number_2137",
+          { expiresIn: "1h" }
+        );
+        return res.status(200).json({
+          userId: existingUser.id,
+          email: existingUser.email,
+          token: token,
+        });
+      }
     }
   } catch (e) {
     return next(new HttpError("Login failed.", 500));

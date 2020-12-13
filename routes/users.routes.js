@@ -1,7 +1,7 @@
 const express = require("express");
 const { check } = require("express-validator");
-const fileUpload = require("../middleware/file_upload");
 
+const fileUpload = require("../middleware/file_upload");
 const {
   getUsersList,
   getUser,

@@ -10,6 +10,7 @@ const {
 } = require("../controllers/places.controllers");
 
 const fileUpload = require("../middleware/file_upload");
+const requireLogin = require("../middleware/auth-check");
 
 const placesRouter = express.Router();
 
@@ -19,6 +20,7 @@ placesRouter.get("/:pid", getPlaceById);
 
 placesRouter.post(
   "/",
+  requireLogin,
   fileUpload.single("image"),
   [
     check("title").not().isEmpty(),
@@ -30,11 +32,12 @@ placesRouter.post(
 
 placesRouter.patch(
   "/:pid",
+  requireLogin,
   fileUpload.single("image"),
   [check("title").not().isEmpty(), check("description").isLength(5)],
   updatePlace
 );
 
-placesRouter.delete("/:pid", deletePlace);
+placesRouter.delete("/:pid", requireLogin, deletePlace);
 
 module.exports = placesRouter;
