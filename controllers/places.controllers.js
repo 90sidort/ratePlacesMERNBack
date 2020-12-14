@@ -80,6 +80,9 @@ const updatePlace = async (req, res, next) => {
     if (!place) {
       return next(new HttpError("Place with this id does not exist.", 404));
     } else {
+      if (place.creator.toString() !== req.userData.userId) {
+        return next(new HttpError("Authorization error.", 401));
+      }
       place.title = title;
       place.description = description;
       place.image = req.file ? req.file.path : place.image;
@@ -99,6 +102,9 @@ const deletePlace = async (req, res, next) => {
     if (!place) {
       return next(new HttpError("No places with this id exist.", 500));
     } else {
+      if (place.creator.id !== req.userData.userId) {
+        return next(new HttpError("Authorization error.", 401));
+      }
       const session = await mongoose.startSession();
       session.startTransaction();
       await place.remove({ session });
