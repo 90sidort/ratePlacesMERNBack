@@ -7,7 +7,7 @@ const HttpError = require("../models/http-error");
 
 const getUsersList = async (req, res, next) => {
   try {
-    const users = await User.find();
+    const users = await User.find({}, "-password");
     return res
       .status(200)
       .json({ users: users.map((user) => user.toObject({ getters: true })) });

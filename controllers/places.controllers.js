@@ -36,7 +36,7 @@ const createPlace = async (req, res, next) => {
   if (errors.length > 0) {
     return next(new HttpError("Invalid inputes, please check your data.", 422));
   }
-  const { title, description, address, creator } = await req.body;
+  const { title, description, address } = await req.body;
   const coordinates = await getLatLong(address);
   if (coordinates === "Error") {
     return next(new HttpError("Invalid address, please check your data.", 422));
@@ -46,12 +46,12 @@ const createPlace = async (req, res, next) => {
     image: req.file ? req.file.path : "placeholder",
     description,
     address,
-    creator,
+    creator: req.userData.userId,
     location: coordinates,
   });
 
   try {
-    const user = await User.findById(creator);
+    const user = await User.findById(req.userData.userId);
     if (!user) {
       return next(new HttpError("Unable to find user.", 500));
     } else {
