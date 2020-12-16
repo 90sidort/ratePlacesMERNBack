@@ -10,7 +10,7 @@ const requireLogin = (req, res, next) => {
     if (!token) {
       return next(new HttpError("Authentication failed!", 403));
     }
-    const decoded = jwt.verify(token, "this_is_the_number_2137");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.userData = { userId: decoded.userId };
     next();
   } catch (e) {

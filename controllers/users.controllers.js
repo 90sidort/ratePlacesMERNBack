@@ -52,7 +52,7 @@ const signup = async (req, res, next) => {
 
       const token = jwt.sign(
         { userId: newUser.id, email: newUser.email },
-        "this_is_the_number_2137",
+        process.env.JWT_SECRET,
         { expiresIn: "1h" }
       );
 
@@ -82,7 +82,7 @@ const login = async (req, res, next) => {
       } else {
         const token = jwt.sign(
           { userId: existingUser.id, email: existingUser.email },
-          "this_is_the_number_2137",
+          process.env.JWT_SECRET,
           { expiresIn: "1h" }
         );
         return res.status(200).json({

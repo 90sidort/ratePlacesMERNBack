@@ -4,7 +4,6 @@ const path = require("path");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
-const { MONGO_URI } = require("./config");
 const placesRouter = require("./routes/places.routes");
 const userRouters = require("./routes/users.routes");
 const errorController = require("./controllers/error.controllers");
@@ -41,7 +40,7 @@ app.use((error, req, res, next) => {
 });
 
 mongoose
-  .connect(MONGO_URI, {
+  .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
