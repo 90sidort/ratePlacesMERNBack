@@ -61,7 +61,6 @@ const signup = async (req, res, next) => {
         .json({ userId: newUser.id, email: newUser.email, token: token });
     }
   } catch (e) {
-    console.log(e);
     return next(new HttpError("Signup failed.", 500));
   }
 };

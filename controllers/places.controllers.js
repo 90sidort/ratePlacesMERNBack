@@ -81,6 +81,19 @@ const likePlace = async (req, res, next) => {
   }
 };
 
+const unlikePlace = async (req, res, next) => {
+  try {
+    const place = await Place.findByIdAndUpdate(
+      req.params.pid,
+      { $pull: { likes: req.userData.userId } },
+      { new: true }
+    );
+    return res.status(200).json({ place: place.toObject({ getters: true }) });
+  } catch (e) {
+    return next(new HttpError("Unable to unlike.", 500));
+  }
+};
+
 const updatePlace = async (req, res, next) => {
   const { errors } = validationResult(req);
   if (errors.length > 0) {
@@ -143,4 +156,5 @@ module.exports = {
   deletePlace,
   updatePlace,
   likePlace,
+  unlikePlace,
 };
