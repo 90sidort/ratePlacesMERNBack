@@ -68,6 +68,19 @@ const createPlace = async (req, res, next) => {
   res.status(201).json(createdPlace);
 };
 
+const likePlace = async (req, res, next) => {
+  try {
+    const place = await Place.findByIdAndUpdate(
+      req.params.pid,
+      { $push: { likes: req.userData.userId } },
+      { new: true }
+    );
+    return res.status(200).json({ place: place.toObject({ getters: true }) });
+  } catch (e) {
+    return next(new HttpError("Unable to like.", 500));
+  }
+};
+
 const updatePlace = async (req, res, next) => {
   const { errors } = validationResult(req);
   if (errors.length > 0) {
@@ -129,4 +142,5 @@ module.exports = {
   createPlace,
   deletePlace,
   updatePlace,
+  likePlace,
 };

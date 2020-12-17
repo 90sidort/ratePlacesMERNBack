@@ -12,6 +12,7 @@ const placeSchema = new Schema({
     lng: { type: Number, required: true },
   },
   creator: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
+  likes: [{ type: mongoose.Schema.ObjectId, ref: "User" }],
 });
 
 module.exports = mongoose.model("Place", placeSchema);

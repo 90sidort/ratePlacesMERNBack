@@ -7,6 +7,7 @@ const {
   createPlace,
   deletePlace,
   updatePlace,
+  likePlace,
 } = require("../controllers/places.controllers");
 
 const fileUpload = require("../middleware/file_upload");
@@ -37,6 +38,8 @@ placesRouter.patch(
   [check("title").not().isEmpty(), check("description").isLength(5)],
   updatePlace
 );
+
+placesRouter.patch("/like/:pid", requireLogin, likePlace);
 
 placesRouter.delete("/:pid", requireLogin, deletePlace);
 
