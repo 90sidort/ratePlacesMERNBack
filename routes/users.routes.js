@@ -17,7 +17,7 @@ userRouters.get("/", getUsersList);
 
 userRouters.get("/:uid", getUser);
 
-userRouters.route("/follow").put(followUser);
+userRouters.route("/follow/:uid").put(requireLogin, followUser);
 
 userRouters.post(
   "/signup",
