@@ -9,6 +9,8 @@ const userSchema = new Schema({
   image: { type: String, required: true },
   password: { type: String, required: true, minlength: 6 },
   places: [{ type: mongoose.Types.ObjectId, required: true, ref: "Place" }],
+  following: [{ type: mongoose.Schema.ObjectId, ref: "User" }],
+  followers: [{ type: mongoose.Schema.ObjectId, ref: "User" }],
 });
 
 userSchema.plugin(mongooseValidator);

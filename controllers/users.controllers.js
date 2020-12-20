@@ -1,6 +1,7 @@
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
 
 const User = require("../models/user.model");
 const HttpError = require("../models/http-error");
@@ -18,7 +19,7 @@ const getUsersList = async (req, res, next) => {
 
 const getUser = async (req, res, next) => {
   try {
-    const user = await User.findOne({ _id: req.params.uid });
+    const user = await User.findOne({ _id: req.params.uid }, "-password");
     if (!user) {
       return next(new HttpError("User with this id does not exist.", 404));
     } else {
@@ -96,4 +97,68 @@ const login = async (req, res, next) => {
   }
 };
 
-module.exports = { getUsersList, getUser, signup, login };
+const followUser = async (req, res, next) => {
+  try {
+    const follower = await User.findById(req.userData.userId);
+    const followed = await User.findById(req.params.uid);
+    if (follower && followed) {
+      if (
+        !follower.following.includes(followed._id) &&
+        !followed.followers.includes(follower._id)
+      ) {
+        const session = await mongoose.startSession();
+        session.startTransaction();
+        follower.following.push(followed._id);
+        followed.followers.push(follower._id);
+        await followed.save({ session });
+        await follower.save({ session });
+        await session.commitTransaction();
+        return res.status(201).json({
+          follow: follower.following,
+          followed: followed.followers.length,
+        });
+      } else {
+        return next(new HttpError("Already following this user.", 400));
+      }
+    } else {
+      return next(new HttpError("Unable to find users.", 400));
+    }
+  } catch (err) {
+    return next(new HttpError("Unable to follow user.", 500));
+  }
+};
+
+const unfollowUser = async (req, res, next) => {
+  try {
+    const follower = await User.findById(req.userData.userId);
+    const followed = await User.findById(req.params.uid);
+    if (follower && followed) {
+      const indexFollower = follower.following.indexOf(followed._id);
+      const indexFollowed = followed.followers.indexOf(follower._id);
+      const session = await mongoose.startSession();
+      session.startTransaction();
+      follower.following.splice(indexFollower, 1);
+      followed.followers.splice(indexFollowed, 1);
+      await followed.save({ session });
+      await follower.save({ session });
+      await session.commitTransaction();
+      return res.status(201).json({
+        follow: follower.following,
+        followed: followed.followers.length,
+      });
+    } else {
+      return next(new HttpError("Unable to find users.", 400));
+    }
+  } catch (err) {
+    return next(new HttpError("Unable to unfollow user.", 500));
+  }
+};
+
+module.exports = {
+  getUsersList,
+  getUser,
+  signup,
+  login,
+  followUser,
+  unfollowUser,
+};

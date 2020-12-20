@@ -2,11 +2,14 @@ const express = require("express");
 const { check } = require("express-validator");
 
 const fileUpload = require("../middleware/file_upload");
+const requireLogin = require("../middleware/auth-check");
 const {
   getUsersList,
   getUser,
   signup,
   login,
+  followUser,
+  unfollowUser,
 } = require("../controllers/users.controllers");
 
 const userRouters = express.Router();
@@ -14,6 +17,10 @@ const userRouters = express.Router();
 userRouters.get("/", getUsersList);
 
 userRouters.get("/:uid", getUser);
+
+userRouters.route("/follow/:uid").put(requireLogin, followUser);
+
+userRouters.route("/unfollow/:uid").put(requireLogin, unfollowUser);
 
 userRouters.post(
   "/signup",
