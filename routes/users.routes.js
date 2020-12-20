@@ -9,6 +9,7 @@ const {
   signup,
   login,
   followUser,
+  unfollowUser,
 } = require("../controllers/users.controllers");
 
 const userRouters = express.Router();
@@ -18,6 +19,8 @@ userRouters.get("/", getUsersList);
 userRouters.get("/:uid", getUser);
 
 userRouters.route("/follow/:uid").put(requireLogin, followUser);
+
+userRouters.route("/unfollow/:uid").put(requireLogin, unfollowUser);
 
 userRouters.post(
   "/signup",
