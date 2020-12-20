@@ -98,22 +98,15 @@ const login = async (req, res, next) => {
 };
 
 const followUser = async (req, res, next) => {
-  console.log(req.params.uid);
-  console.log(req.userData.userId);
   try {
-    console.log(1);
     const follower = await User.findById(req.userData.userId);
-    console.log(2);
     const followed = await User.findById(req.params.uid);
-    console.log(3);
     if (follower && followed) {
       if (
         !follower.following.includes(followed._id) &&
         !followed.followers.includes(follower._id)
       ) {
-        console.log(4);
         const session = await mongoose.startSession();
-        console.log(5);
         session.startTransaction();
         follower.following.push(followed._id);
         followed.followers.push(follower._id);
@@ -131,26 +124,18 @@ const followUser = async (req, res, next) => {
       return next(new HttpError("Unable to find users.", 400));
     }
   } catch (err) {
-    console.log(err);
     return next(new HttpError("Unable to follow user.", 500));
   }
 };
 
 const unfollowUser = async (req, res, next) => {
-  console.log(req.params.uid);
-  console.log(req.userData.userId);
   try {
-    console.log(1);
     const follower = await User.findById(req.userData.userId);
-    console.log(2);
     const followed = await User.findById(req.params.uid);
-    console.log(3);
     if (follower && followed) {
       const indexFollower = follower.following.indexOf(followed._id);
       const indexFollowed = followed.followers.indexOf(follower._id);
-      console.log(4);
       const session = await mongoose.startSession();
-      console.log(5);
       session.startTransaction();
       follower.following.splice(indexFollower, 1);
       followed.followers.splice(indexFollowed, 1);
@@ -165,7 +150,6 @@ const unfollowUser = async (req, res, next) => {
       return next(new HttpError("Unable to find users.", 400));
     }
   } catch (err) {
-    console.log(err);
     return next(new HttpError("Unable to unfollow user.", 500));
   }
 };
