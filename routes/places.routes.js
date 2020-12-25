@@ -26,7 +26,7 @@ placesRouter.post(
   fileUpload.single("image"),
   [
     check("title").not().isEmpty(),
-    check("description").isLength(5),
+    check("about").isLength(5),
     check("address").not().isEmpty(),
   ],
   createPlace
@@ -36,7 +36,7 @@ placesRouter.patch(
   "/:pid",
   requireLogin,
   fileUpload.single("image"),
-  [check("title").not().isEmpty(), check("description").isLength(5)],
+  [check("title").not().isEmpty(), check("about").isLength(5)],
   updatePlace
 );
 
