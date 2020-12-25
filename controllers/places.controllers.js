@@ -36,7 +36,7 @@ const createPlace = async (req, res, next) => {
   if (errors.length > 0) {
     return next(new HttpError("Invalid inputes, please check your data.", 422));
   }
-  const { title, about, address, description } = await req.body;
+  const { title, about, address, description, type } = await req.body;
   const coordinates = await getLatLong(address);
   if (coordinates === "Error") {
     return next(new HttpError("Invalid address, please check your data.", 422));
@@ -45,6 +45,7 @@ const createPlace = async (req, res, next) => {
     title,
     image: req.file ? req.file.path : "placeholder",
     about,
+    type,
     address,
     description,
     creator: req.userData.userId,
@@ -101,7 +102,7 @@ const updatePlace = async (req, res, next) => {
     return next(new HttpError("Invalid inputs, please check your data.", 422));
   }
 
-  const { title, about, description } = await req.body;
+  const { title, about, description, type } = await req.body;
   try {
     const place = await Place.findById({ _id: req.params.pid });
     if (!place) {
@@ -111,6 +112,7 @@ const updatePlace = async (req, res, next) => {
         return next(new HttpError("Authorization error.", 401));
       }
       place.title = title;
+      place.type = type;
       place.description = description;
       place.about = about;
       place.image = req.file ? req.file.path : place.image;
