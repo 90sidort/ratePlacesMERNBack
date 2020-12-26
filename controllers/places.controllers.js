@@ -7,6 +7,33 @@ const { getLatLong } = require("../utils/location");
 const Place = require("../models/place.model");
 const User = require("../models/user.model");
 
+const addComment = async (req, res, next) => {
+  console.log("KURWA");
+  console.log(req.body.comment);
+  console.log(req.params.pid);
+  // res.send({ comment: req.body.comment });
+  try {
+    const place = await Place.findById({ _id: req.params.pid });
+    const comment = await req.body.comment;
+    const userId = await req.body.userId;
+    console.log(place);
+    if (!place) {
+      return next(new HttpError("Place with this id does not exist.", 404));
+    } else {
+      place.comments.push({
+        text: comment,
+        created: 1,
+        postedBy: userId,
+      });
+      place.save();
+      return res.send({ place });
+    }
+  } catch (e) {
+    console.log(e);
+    return next(new HttpError("Server error.", 500));
+  }
+};
+
 const getPlacesByUser = async (req, res, next) => {
   try {
     const places = await Place.find({ creator: req.params.uid });
@@ -34,7 +61,7 @@ const getPlaceById = async (req, res, next) => {
 const createPlace = async (req, res, next) => {
   const { errors } = validationResult(req);
   if (errors.length > 0) {
-    return next(new HttpError("Invalid inputes, please check your data.", 422));
+    return next(new HttpError("Invalid inputs, please check your data.", 422));
   }
   const { title, about, address, description, type } = await req.body;
   const coordinates = await getLatLong(address);
@@ -97,6 +124,7 @@ const unlikePlace = async (req, res, next) => {
 };
 
 const updatePlace = async (req, res, next) => {
+  console.log(await req.body);
   const { errors } = validationResult(req);
   if (errors.length > 0) {
     return next(new HttpError("Invalid inputs, please check your data.", 422));
@@ -161,4 +189,5 @@ module.exports = {
   updatePlace,
   likePlace,
   unlikePlace,
+  addComment,
 };

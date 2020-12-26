@@ -9,6 +9,7 @@ const {
   updatePlace,
   likePlace,
   unlikePlace,
+  addComment,
 } = require("../controllers/places.controllers");
 
 const fileUpload = require("../middleware/file_upload");
@@ -31,6 +32,8 @@ placesRouter.post(
   ],
   createPlace
 );
+
+placesRouter.post("/comments/:pid", requireLogin, addComment);
 
 placesRouter.patch(
   "/:pid",
