@@ -5,9 +5,6 @@ const requireLogin = (req, res, next) => {
   if (req.method === "OPTIONS") {
     return next();
   }
-  if (req.headers.special === "True") {
-    return next();
-  }
   try {
     const token = req.headers.authorization.split(" ")[1];
     if (!token) {
