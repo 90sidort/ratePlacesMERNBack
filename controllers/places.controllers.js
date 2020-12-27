@@ -7,33 +7,6 @@ const { getLatLong } = require("../utils/location");
 const Place = require("../models/place.model");
 const User = require("../models/user.model");
 
-const addComment = async (req, res, next) => {
-  console.log("KURWA");
-  console.log(req.body.comment);
-  console.log(req.params.pid);
-  // res.send({ comment: req.body.comment });
-  try {
-    const place = await Place.findById({ _id: req.params.pid });
-    const comment = await req.body.comment;
-    const userId = await req.body.userId;
-    console.log(place);
-    if (!place) {
-      return next(new HttpError("Place with this id does not exist.", 404));
-    } else {
-      place.comments.push({
-        text: comment,
-        created: 1,
-        postedBy: userId,
-      });
-      place.save();
-      return res.send({ place });
-    }
-  } catch (e) {
-    console.log(e);
-    return next(new HttpError("Server error.", 500));
-  }
-};
-
 const getPlacesByUser = async (req, res, next) => {
   try {
     const places = await Place.find({ creator: req.params.uid });
@@ -97,34 +70,7 @@ const createPlace = async (req, res, next) => {
   res.status(201).json(createdPlace);
 };
 
-const likePlace = async (req, res, next) => {
-  try {
-    const place = await Place.findByIdAndUpdate(
-      req.params.pid,
-      { $push: { likes: req.userData.userId } },
-      { new: true }
-    );
-    return res.status(200).json({ place: place.toObject({ getters: true }) });
-  } catch (e) {
-    return next(new HttpError("Unable to like.", 500));
-  }
-};
-
-const unlikePlace = async (req, res, next) => {
-  try {
-    const place = await Place.findByIdAndUpdate(
-      req.params.pid,
-      { $pull: { likes: req.userData.userId } },
-      { new: true }
-    );
-    return res.status(200).json({ place: place.toObject({ getters: true }) });
-  } catch (e) {
-    return next(new HttpError("Unable to unlike.", 500));
-  }
-};
-
 const updatePlace = async (req, res, next) => {
-  console.log(await req.body);
   const { errors } = validationResult(req);
   if (errors.length > 0) {
     return next(new HttpError("Invalid inputs, please check your data.", 422));
@@ -187,7 +133,4 @@ module.exports = {
   createPlace,
   deletePlace,
   updatePlace,
-  likePlace,
-  unlikePlace,
-  addComment,
 };
