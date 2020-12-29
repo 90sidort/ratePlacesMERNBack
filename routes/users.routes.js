@@ -11,6 +11,7 @@ const {
   followUser,
   unfollowUser,
   getUsers,
+  updateUser,
 } = require("../controllers/users.controllers");
 
 const userRouters = express.Router();
@@ -34,6 +35,14 @@ userRouters.post(
     check("email").normalizeEmail().isEmail(),
   ],
   signup
+);
+
+userRouters.patch(
+  "/:uid",
+  requireLogin,
+  fileUpload.single("image"),
+  [check("name").not().isEmpty(), check("email").normalizeEmail().isEmail()],
+  updateUser
 );
 
 userRouters.post("/login", login);
