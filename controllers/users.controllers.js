@@ -60,7 +60,7 @@ const signup = async (req, res, next) => {
       const newUser = await new User({
         name,
         email,
-        image: req.file.path,
+        image: req.file ? req.file.path : "placeholder",
         password: hashedPassword,
         places: [],
       });
@@ -177,7 +177,7 @@ const updateUser = async (req, res, next) => {
   const { name, about, email } = await req.body;
   try {
     const user = await User.findById({ _id: req.params.uid }).select(
-      "_id name about email"
+      "_id name about email image"
     );
     if (!user) {
       return next(new HttpError("User with this id does not exist.", 404));
@@ -191,12 +191,11 @@ const updateUser = async (req, res, next) => {
         about.trim().length === 0
           ? "Hi, maybe you'll tell us a bit about yourself"
           : about;
-      // user.image = req.file ? req.file.path : place.image;
+      user.image = req.file ? req.file.path : user.image;
       await user.save();
       return res.status(200).json({ user: user.toObject({ getters: true }) });
     }
   } catch (e) {
-    console.log(e);
     return next(new HttpError("Server error.", 500));
   }
 };

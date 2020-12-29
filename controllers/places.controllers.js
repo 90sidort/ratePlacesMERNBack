@@ -76,20 +76,32 @@ const updatePlace = async (req, res, next) => {
     return next(new HttpError("Invalid inputs, please check your data.", 422));
   }
 
-  const { title, about, description, type } = await req.body;
+  const { title, about, description, type, address } = await req.body;
   try {
     const place = await Place.findById({ _id: req.params.pid });
     if (!place) {
       return next(new HttpError("Place with this id does not exist.", 404));
     } else {
+      let coordinates = place.location;
+      if (address !== place.address) {
+        coordinates = await getLatLong(address);
+        if (coordinates === "Error") {
+          return next(
+            new HttpError("Invalid address, please check your data.", 422)
+          );
+        }
+      }
+
       if (place.creator.toString() !== req.userData.userId) {
         return next(new HttpError("Authorization error.", 401));
       }
       place.title = title;
+      place.location = coordinates;
       place.type = type;
+      place.address = address;
       place.description = description;
       place.about = about;
-      place.image = req.file ? req.file.path : place.image;
+      place.image = place.image = req.file ? req.file.path : place.image;
       await place.save();
       return res.status(200).json({ place: place.toObject({ getters: true }) });
     }
