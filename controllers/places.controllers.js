@@ -34,7 +34,7 @@ const getPlaceById = async (req, res, next) => {
 const createPlace = async (req, res, next) => {
   const { errors } = validationResult(req);
   if (errors.length > 0) {
-    return next(new HttpError("Invalid inputes, please check your data.", 422));
+    return next(new HttpError("Invalid inputs, please check your data.", 422));
   }
   const { title, about, address, description, type } = await req.body;
   const coordinates = await getLatLong(address);
@@ -70,52 +70,38 @@ const createPlace = async (req, res, next) => {
   res.status(201).json(createdPlace);
 };
 
-const likePlace = async (req, res, next) => {
-  try {
-    const place = await Place.findByIdAndUpdate(
-      req.params.pid,
-      { $push: { likes: req.userData.userId } },
-      { new: true }
-    );
-    return res.status(200).json({ place: place.toObject({ getters: true }) });
-  } catch (e) {
-    return next(new HttpError("Unable to like.", 500));
-  }
-};
-
-const unlikePlace = async (req, res, next) => {
-  try {
-    const place = await Place.findByIdAndUpdate(
-      req.params.pid,
-      { $pull: { likes: req.userData.userId } },
-      { new: true }
-    );
-    return res.status(200).json({ place: place.toObject({ getters: true }) });
-  } catch (e) {
-    return next(new HttpError("Unable to unlike.", 500));
-  }
-};
-
 const updatePlace = async (req, res, next) => {
   const { errors } = validationResult(req);
   if (errors.length > 0) {
     return next(new HttpError("Invalid inputs, please check your data.", 422));
   }
 
-  const { title, about, description, type } = await req.body;
+  const { title, about, description, type, address } = await req.body;
   try {
     const place = await Place.findById({ _id: req.params.pid });
     if (!place) {
       return next(new HttpError("Place with this id does not exist.", 404));
     } else {
+      let coordinates = place.location;
+      if (address !== place.address) {
+        coordinates = await getLatLong(address);
+        if (coordinates === "Error") {
+          return next(
+            new HttpError("Invalid address, please check your data.", 422)
+          );
+        }
+      }
+
       if (place.creator.toString() !== req.userData.userId) {
         return next(new HttpError("Authorization error.", 401));
       }
       place.title = title;
+      place.location = coordinates;
       place.type = type;
+      place.address = address;
       place.description = description;
       place.about = about;
-      place.image = req.file ? req.file.path : place.image;
+      place.image = place.image = req.file ? req.file.path : place.image;
       await place.save();
       return res.status(200).json({ place: place.toObject({ getters: true }) });
     }
@@ -159,6 +145,4 @@ module.exports = {
   createPlace,
   deletePlace,
   updatePlace,
-  likePlace,
-  unlikePlace,
 };

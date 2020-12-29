@@ -7,9 +7,15 @@ const {
   createPlace,
   deletePlace,
   updatePlace,
+} = require("../controllers/places.controllers");
+
+const {
   likePlace,
   unlikePlace,
-} = require("../controllers/places.controllers");
+  addComment,
+  delComment,
+  getComments,
+} = require("../controllers/actions.controllers");
 
 const fileUpload = require("../middleware/file_upload");
 const requireLogin = require("../middleware/auth-check");
@@ -31,6 +37,10 @@ placesRouter.post(
   ],
   createPlace
 );
+
+placesRouter.get("/comments/:pid", getComments);
+placesRouter.post("/comments/:pid", requireLogin, addComment);
+placesRouter.patch("/comments/:pid", requireLogin, delComment);
 
 placesRouter.patch(
   "/:pid",

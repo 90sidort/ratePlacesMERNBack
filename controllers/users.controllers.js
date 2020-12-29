@@ -17,6 +17,21 @@ const getUsersList = async (req, res, next) => {
   }
 };
 
+const getUsers = async (req, res, next) => {
+  try {
+    if (req.body.usersIdsFollowed || req.body.userIdsFollowers) {
+      const followed = await User.find({
+        _id: { $in: req.body.usersIdsFollowed },
+      }).select("name image _id");
+      const followers = await User.find({
+        _id: { $in: req.body.userIdsFollowers },
+      }).select("name image _id");
+      return res.status(200).json({ followed, followers });
+    }
+    return res.json({ followed: [], followers: [] });
+  } catch (e) {}
+};
+
 const getUser = async (req, res, next) => {
   try {
     const user = await User.findOne({ _id: req.params.uid }, "-password");
@@ -45,7 +60,7 @@ const signup = async (req, res, next) => {
       const newUser = await new User({
         name,
         email,
-        image: req.file.path,
+        image: req.file ? req.file.path : "placeholder",
         password: hashedPassword,
         places: [],
       });
@@ -154,6 +169,37 @@ const unfollowUser = async (req, res, next) => {
   }
 };
 
+const updateUser = async (req, res, next) => {
+  const { errors } = validationResult(req);
+  if (errors.length > 0) {
+    return next(new HttpError("Invalid inputs, please check your data.", 422));
+  }
+  const { name, about, email } = await req.body;
+  try {
+    const user = await User.findById({ _id: req.params.uid }).select(
+      "_id name about email image"
+    );
+    if (!user) {
+      return next(new HttpError("User with this id does not exist.", 404));
+    } else {
+      if (user._id.toString() !== req.userData.userId) {
+        return next(new HttpError("Authorization error.", 401));
+      }
+      user.name = name;
+      user.email = email;
+      user.about =
+        about.trim().length === 0
+          ? "Hi, maybe you'll tell us a bit about yourself"
+          : about;
+      user.image = req.file ? req.file.path : user.image;
+      await user.save();
+      return res.status(200).json({ user: user.toObject({ getters: true }) });
+    }
+  } catch (e) {
+    return next(new HttpError("Server error.", 500));
+  }
+};
+
 module.exports = {
   getUsersList,
   getUser,
@@ -161,4 +207,6 @@ module.exports = {
   login,
   followUser,
   unfollowUser,
+  getUsers,
+  updateUser,
 };

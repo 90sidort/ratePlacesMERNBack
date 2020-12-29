@@ -11,6 +11,10 @@ const userSchema = new Schema({
   places: [{ type: mongoose.Types.ObjectId, required: true, ref: "Place" }],
   following: [{ type: mongoose.Schema.ObjectId, ref: "User" }],
   followers: [{ type: mongoose.Schema.ObjectId, ref: "User" }],
+  about: {
+    type: String,
+    default: "Hi, maybe you'll tell us a bit about yourself",
+  },
 });
 
 userSchema.plugin(mongooseValidator);

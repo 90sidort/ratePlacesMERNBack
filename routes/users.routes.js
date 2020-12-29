@@ -10,6 +10,8 @@ const {
   login,
   followUser,
   unfollowUser,
+  getUsers,
+  updateUser,
 } = require("../controllers/users.controllers");
 
 const userRouters = express.Router();
@@ -17,6 +19,8 @@ const userRouters = express.Router();
 userRouters.get("/", getUsersList);
 
 userRouters.get("/:uid", getUser);
+
+userRouters.patch("/details/get", getUsers);
 
 userRouters.route("/follow/:uid").put(requireLogin, followUser);
 
@@ -31,6 +35,14 @@ userRouters.post(
     check("email").normalizeEmail().isEmail(),
   ],
   signup
+);
+
+userRouters.patch(
+  "/:uid",
+  requireLogin,
+  fileUpload.single("image"),
+  [check("name").not().isEmpty(), check("email").normalizeEmail().isEmail()],
+  updateUser
 );
 
 userRouters.post("/login", login);
