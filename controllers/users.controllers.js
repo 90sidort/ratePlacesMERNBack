@@ -17,6 +17,21 @@ const getUsersList = async (req, res, next) => {
   }
 };
 
+const getUsers = async (req, res, next) => {
+  try {
+    if (req.body.usersIdsFollowed || req.body.userIdsFollowers) {
+      const followed = await User.find({
+        _id: { $in: req.body.usersIdsFollowed },
+      }).select("name image _id");
+      const followers = await User.find({
+        _id: { $in: req.body.userIdsFollowers },
+      }).select("name image _id");
+      return res.status(200).json({ followed, followers });
+    }
+    return res.json({ followed: [], followers: [] });
+  } catch (e) {}
+};
+
 const getUser = async (req, res, next) => {
   try {
     const user = await User.findOne({ _id: req.params.uid }, "-password");
@@ -161,4 +176,5 @@ module.exports = {
   login,
   followUser,
   unfollowUser,
+  getUsers,
 };
