@@ -10,6 +10,7 @@ const {
   login,
   followUser,
   unfollowUser,
+  getUsers,
 } = require("../controllers/users.controllers");
 
 const userRouters = express.Router();
@@ -17,6 +18,8 @@ const userRouters = express.Router();
 userRouters.get("/", getUsersList);
 
 userRouters.get("/:uid", getUser);
+
+userRouters.patch("/details/get", getUsers);
 
 userRouters.route("/follow/:uid").put(requireLogin, followUser);
 
