@@ -20,6 +20,7 @@ const placeSchema = new Schema({
       text: String,
       created: { type: Date, default: Date.now },
       postedBy: { type: mongoose.Schema.ObjectId, ref: "User" },
+      userName: { type: String },
     },
   ],
 });
