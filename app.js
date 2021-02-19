@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
+require("./db/mongoose.js");
 const placesRouter = require("./routes/places.routes");
 const userRouters = require("./routes/users.routes");
 const errorController = require("./controllers/error.controllers");
@@ -32,13 +33,4 @@ app.use((error, req, res, next) => {
   res.json({ message: error.message || "An unknown error occured." });
 });
 
-mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: true,
-  })
-  .then(() => {
-    app.listen(5000);
-  })
-  .catch(() => console.log("unnable to connect"));
+module.exports = app;
