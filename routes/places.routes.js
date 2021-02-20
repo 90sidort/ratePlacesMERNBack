@@ -14,7 +14,6 @@ const {
   unlikePlace,
   addComment,
   delComment,
-  getComments,
 } = require("../controllers/actions.controllers");
 
 const fileUpload = require("../middleware/file_upload");
@@ -38,7 +37,6 @@ placesRouter.post(
   createPlace
 );
 
-placesRouter.get("/comments/:pid", getComments);
 placesRouter.post("/comments/:pid", requireLogin, addComment);
 placesRouter.patch("/comments/:pid", requireLogin, delComment);
 

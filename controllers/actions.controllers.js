@@ -1,19 +1,6 @@
 const HttpError = require("../models/http-error");
 const Place = require("../models/place.model");
 
-const getComments = async (req, res, next) => {
-  try {
-    const place = await Place.findById({ _id: req.params.pid });
-    if (!place) {
-      return next(new HttpError("Place with this id does not exist.", 404));
-    } else {
-      return res.send(place);
-    }
-  } catch (e) {
-    return next(new HttpError("Server error.", 500));
-  }
-};
-
 const addComment = async (req, res, next) => {
   try {
     const place = await Place.findById({ _id: req.params.pid });
@@ -87,5 +74,4 @@ module.exports = {
   unlikePlace,
   addComment,
   delComment,
-  getComments,
 };
