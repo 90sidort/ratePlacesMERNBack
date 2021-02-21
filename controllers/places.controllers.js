@@ -100,7 +100,10 @@ const updatePlace = async (req, res, next) => {
         coordinates = await getLatLong(address);
         if (coordinates === "Error") {
           return next(
-            new HttpError("Invalid address, please check your data.", 422)
+            new HttpError(
+              "Invalid address. Correct address format example: 10 Long Street, Big City, Super Country.",
+              422
+            )
           );
         }
       }

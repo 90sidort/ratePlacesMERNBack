@@ -33,4 +33,12 @@ const placeTwo = {
   creator: "",
 };
 
-module.exports = { placeOne, placeTwo };
+const placeChange = {
+  title: "Changed title",
+  about: "Changed about",
+  description: "Changed description",
+  type: "other",
+  address: "21 Szczesliwicka, Warsaw, Poland",
+};
+
+module.exports = { placeOne, placeTwo, placeChange };
