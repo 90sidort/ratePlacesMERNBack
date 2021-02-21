@@ -1,4 +1,3 @@
-const mongoose = require("mongoose");
 const request = require("supertest");
 const jwt = require("jsonwebtoken");
 
@@ -9,9 +8,10 @@ const User = require("../../models/user.model");
 const { userOne } = require("../fixtures/users.fixture");
 const { placeOne, placeChange } = require("../fixtures/places.fixture");
 
-describe("Place creation tests", () => {
+describe("Place update tests", () => {
   let user1;
   let place1;
+  let comment1;
   let token;
 
   beforeAll(async () => {
@@ -55,7 +55,56 @@ describe("Place creation tests", () => {
     );
   });
 
-  test("Should not be able to create place with invalid address", async () => {
+  test("Should be able to give like to a place", async () => {
+    const response = await request(app)
+      .patch(`/api/places/like/${place1._id}`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({})
+      .expect(200);
+
+    expect(response.body.place.likes[0].toString()).toEqual(
+      user1._id.toString()
+    );
+  });
+
+  test("Should be able to unlike to a place", async () => {
+    const response = await request(app)
+      .patch(`/api/places/unlike/${place1._id}`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({})
+      .expect(200);
+
+    expect(response.body.place.likes.length).toEqual(0);
+  });
+
+  test("Should be able to add comment to a place", async () => {
+    const response = await request(app)
+      .post(`/api/places/comments/${place1._id}`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        comment: "This is a test comment",
+        userId: user1._id,
+        userName: user1.name,
+      })
+      .expect(200);
+    comment1 = response.body.place.comments[1]._id;
+    expect(response.body.place.comments[1].text).toEqual(
+      "This is a test comment"
+    );
+  });
+
+  test("Should be able to remove comment from a place", async () => {
+    const response = await request(app)
+      .patch(`/api/places/comments/${place1._id}`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({ cid: comment1 })
+      .expect(200);
+
+    console.log(response.body.place);
+    expect(response.body.place.comments.length).toEqual(1);
+  });
+
+  test("Should not be able to update place with invalid address", async () => {
     placeChange.address = "test address will not work";
     const response = await request(app)
       .patch(`/api/places/${place1._id}`)
@@ -68,7 +117,7 @@ describe("Place creation tests", () => {
     );
   });
 
-  test("Should not be able to create place with invalid data", async () => {
+  test("Should not be able to update place with invalid data", async () => {
     placeChange.title = "";
     placeChange.about = "";
     placeChange.address = "";

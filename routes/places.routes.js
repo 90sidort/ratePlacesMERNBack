@@ -33,9 +33,6 @@ placesRouter.post(
   createPlace
 );
 
-placesRouter.post("/comments/:pid", requireLogin, addComment);
-placesRouter.patch("/comments/:pid", requireLogin, delComment);
-
 placesRouter.patch(
   "/:pid",
   requireLogin,
@@ -44,9 +41,12 @@ placesRouter.patch(
   updatePlace
 );
 
+placesRouter.delete("/:pid", requireLogin, deletePlace);
+
+placesRouter.post("/comments/:pid", requireLogin, addComment);
+placesRouter.patch("/comments/:pid", requireLogin, delComment);
+
 placesRouter.patch("/like/:pid", requireLogin, likePlace);
 placesRouter.patch("/unlike/:pid", requireLogin, unlikePlace);
-
-placesRouter.delete("/:pid", requireLogin, deletePlace);
 
 module.exports = placesRouter;

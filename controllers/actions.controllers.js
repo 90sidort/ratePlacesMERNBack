@@ -3,10 +3,8 @@ const Place = require("../models/place.model");
 
 const addComment = async (req, res, next) => {
   try {
+    const { comment, userId, userName } = req.body;
     const place = await Place.findById({ _id: req.params.pid });
-    const comment = await req.body.comment;
-    const userId = await req.body.userId;
-    const userName = await req.body.userName;
     if (!place) {
       return next(new HttpError("Place with this id does not exist.", 404));
     } else {
@@ -14,7 +12,7 @@ const addComment = async (req, res, next) => {
         text: comment,
         created: 1,
         postedBy: userId,
-        userName: userName,
+        userName,
       });
       place.save();
       return res.status(200).json({ place: place.toObject({ getters: true }) });
