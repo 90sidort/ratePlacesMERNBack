@@ -1,5 +1,4 @@
 const express = require("express");
-const { check } = require("express-validator");
 
 const {
   getPlaceById,
@@ -18,6 +17,7 @@ const {
 
 const fileUpload = require("../middleware/file_upload");
 const requireLogin = require("../middleware/auth-check");
+const validatePlace = require("../validators/place.validator");
 
 const placesRouter = express.Router();
 
@@ -29,11 +29,7 @@ placesRouter.post(
   "/",
   requireLogin,
   fileUpload.single("image"),
-  [
-    check("title").not().isEmpty(),
-    check("about").isLength(5),
-    check("address").not().isEmpty(),
-  ],
+  validatePlace,
   createPlace
 );
 
@@ -44,7 +40,7 @@ placesRouter.patch(
   "/:pid",
   requireLogin,
   fileUpload.single("image"),
-  [check("title").not().isEmpty(), check("about").isLength(5)],
+  validatePlace,
   updatePlace
 );
 

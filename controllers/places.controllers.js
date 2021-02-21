@@ -34,12 +34,21 @@ const getPlaceById = async (req, res, next) => {
 const createPlace = async (req, res, next) => {
   const { errors } = validationResult(req);
   if (errors.length > 0) {
-    return next(new HttpError("Invalid inputs, please check your data.", 422));
+    let errorMessage = "";
+    await errors.forEach((e) => {
+      errorMessage = errorMessage + `${e.param.toUpperCase()}: ${e.msg}` + "\n";
+    });
+    return next(new HttpError(errorMessage, 422));
   }
   const { title, about, address, description, type } = await req.body;
   const coordinates = await getLatLong(address);
   if (coordinates === "Error") {
-    return next(new HttpError("Invalid address, please check your data.", 422));
+    return next(
+      new HttpError(
+        "Invalid address. Correct address format example: 10 Long Street, Big City, Super Country.",
+        422
+      )
+    );
   }
   const createdPlace = new Place({
     title,
@@ -73,7 +82,11 @@ const createPlace = async (req, res, next) => {
 const updatePlace = async (req, res, next) => {
   const { errors } = validationResult(req);
   if (errors.length > 0) {
-    return next(new HttpError("Invalid inputs, please check your data.", 422));
+    let errorMessage = "";
+    await errors.forEach((e) => {
+      errorMessage = errorMessage + `${e.param.toUpperCase()}: ${e.msg}` + "\n";
+    });
+    return next(new HttpError(errorMessage, 422));
   }
 
   const { title, about, description, type, address } = await req.body;

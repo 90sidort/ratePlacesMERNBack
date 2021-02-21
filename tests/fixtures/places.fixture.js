@@ -24,4 +24,13 @@ const placeOne = {
   comments: [commentOne],
 };
 
-module.exports = { placeOne };
+const placeTwo = {
+  title: "Test title for place",
+  about: "Test about for place",
+  type: "monument",
+  address: "21 Szczesliwicka, Warsaw, Poland",
+  description: "Nice, quiet place in the midst of lively city.",
+  creator: "",
+};
+
+module.exports = { placeOne, placeTwo };
