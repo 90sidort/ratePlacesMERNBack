@@ -31,6 +31,38 @@ const getPlaceById = async (req, res, next) => {
   }
 };
 
+const getMostPopular = async (req, res, next) => {
+  try {
+    const places = await Place.aggregate([
+      {
+        $project: {
+          title: 1,
+          about: 1,
+          type: 1,
+          description: 1,
+          image: 1,
+          address: 1,
+          location: 1,
+          creator: 1,
+          likes: 1,
+          comments: 1,
+          length: { $size: "$likes" },
+        },
+      },
+      { $sort: { length: -1 } },
+      { $limit: 5 },
+    ]);
+    if (places.length < 1) {
+      return res.status(200).json({ message: "No places found" });
+    }
+
+    return res.status(200).send({ places });
+  } catch (e) {
+    console.log(e);
+    return next(new HttpError("Server error.", 500));
+  }
+};
+
 const createPlace = async (req, res, next) => {
   const { errors } = validationResult(req);
   if (errors.length > 0) {
@@ -161,4 +193,5 @@ module.exports = {
   createPlace,
   deletePlace,
   updatePlace,
+  getMostPopular,
 };

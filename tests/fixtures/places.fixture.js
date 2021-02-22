@@ -33,6 +33,26 @@ const placeTwo = {
   creator: "",
 };
 
+const placeThree = {
+  title: "Test Place Three",
+  about: "Test about string, nothing to see here.",
+  type: "monument",
+  description: "Test description, really not interesting.",
+  image: "placeholder",
+  address: "21 Test Street, Test City, Test Country",
+  location: {
+    lat: 53.422691,
+    lng: 14.541423,
+  },
+  creator: "",
+  likes: [
+    new mongoose.Types.ObjectId(),
+    new mongoose.Types.ObjectId(),
+    new mongoose.Types.ObjectId(),
+  ],
+  comments: [],
+};
+
 const placeChange = {
   title: "Changed title",
   about: "Changed about",
@@ -41,4 +61,4 @@ const placeChange = {
   address: "21 Szczesliwicka, Warsaw, Poland",
 };
 
-module.exports = { placeOne, placeTwo, placeChange };
+module.exports = { placeOne, placeTwo, placeChange, placeThree };

@@ -6,6 +6,7 @@ const {
   createPlace,
   deletePlace,
   updatePlace,
+  getMostPopular,
 } = require("../controllers/places.controllers");
 
 const {
@@ -22,6 +23,8 @@ const validatePlace = require("../validators/place.validator");
 const placesRouter = express.Router();
 
 placesRouter.get("/user/:uid", getPlacesByUser);
+
+placesRouter.get("/popular", getMostPopular);
 
 placesRouter.get("/:pid", getPlaceById);
 

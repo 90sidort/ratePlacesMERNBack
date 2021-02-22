@@ -5,7 +5,7 @@ const app = require("../../app");
 
 const Place = require("../../models/place.model");
 const User = require("../../models/user.model");
-const { placeOne } = require("../fixtures/places.fixture");
+const { placeOne, placeThree } = require("../fixtures/places.fixture");
 const { userOne } = require("../fixtures/users.fixture");
 
 describe("Should be able to retrieve places", () => {
@@ -73,5 +73,13 @@ describe("Should be able to retrieve places", () => {
       .expect(404);
 
     expect(response.body.message).toEqual("This place does not exist!");
+  });
+
+  test("Should sort places by number of likes", async () => {
+    placeThree.creator = user1._id;
+    await new Place(placeThree).save();
+    const response = await request(app).get(`/api/places/popular/`).expect(200);
+
+    expect(response.body.places[0].title).toEqual("Test Place Three");
   });
 });
