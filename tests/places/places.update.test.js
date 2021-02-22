@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const request = require("supertest");
 const jwt = require("jsonwebtoken");
 
@@ -6,7 +7,11 @@ const app = require("../../app");
 const Place = require("../../models/place.model");
 const User = require("../../models/user.model");
 const { userOne } = require("../fixtures/users.fixture");
-const { placeOne, placeChange } = require("../fixtures/places.fixture");
+const {
+  placeOne,
+  placeChange,
+  commentOne,
+} = require("../fixtures/places.fixture");
 
 describe("Place update tests", () => {
   let user1;
@@ -97,11 +102,22 @@ describe("Place update tests", () => {
     const response = await request(app)
       .patch(`/api/places/comments/${place1._id}`)
       .set("Authorization", `Bearer ${token}`)
-      .send({ cid: comment1 })
+      .send({ cid: comment1, userId: user1._id })
       .expect(200);
 
-    console.log(response.body.place);
     expect(response.body.place.comments.length).toEqual(1);
+  });
+
+  test("Should not be able to remove nonexisten comment", async () => {
+    const response = await request(app)
+      .patch(`/api/places/comments/${place1._id}`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({ cid: new mongoose.Types.ObjectId(), userId: user1._id })
+      .expect(404);
+
+    expect(response.body.message).toEqual(
+      "Comment does not exist or it is not your comment."
+    );
   });
 
   test("Should not be able to update place with invalid address", async () => {

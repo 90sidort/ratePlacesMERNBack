@@ -26,15 +26,27 @@ const delComment = async (req, res, next) => {
   try {
     let place = await Place.findById({ _id: req.params.pid });
     const commentId = req.body.cid;
+    const uid = req.body.userId;
     if (!place) {
       return next(new HttpError("Place with this id does not exist.", 404));
     } else {
-      const updatedComments = await place.comments.filter(
-        (comment) => comment._id.toString() !== commentId
+      const deleteComment = await place.comments.findIndex((comment) => {
+        return (
+          comment._id.toString() === commentId.toString() &&
+          comment.postedBy.toString() === uid.toString()
+        );
+      });
+      if (deleteComment !== -1) {
+        await place.comments.splice(deleteComment, 1);
+        place.comments = place.comments;
+        await place.save();
+        return res
+          .status(200)
+          .json({ place: place.toObject({ getters: true }) });
+      }
+      return next(
+        new HttpError("Comment does not exist or it is not your comment.", 404)
       );
-      place.comments = updatedComments;
-      await place.save();
-      return res.status(200).json({ place: place.toObject({ getters: true }) });
     }
   } catch (e) {
     return next(new HttpError("Server error.", 500));
