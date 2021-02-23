@@ -8,9 +8,10 @@ const User = require("../../models/user.model");
 const { placeOne, placeThree } = require("../fixtures/places.fixture");
 const { userOne } = require("../fixtures/users.fixture");
 
-describe("Should be able to retrieve places", () => {
+describe("Users retrieve tests", () => {
   let user1;
   let place1;
+
   beforeAll(async () => {
     await Place.deleteMany();
     await User.deleteMany();
@@ -18,10 +19,12 @@ describe("Should be able to retrieve places", () => {
     placeOne.creator = user1._id;
     place1 = await new Place(placeOne).save();
   });
+
   afterAll(async () => {
     await Place.deleteMany();
     await User.deleteMany();
   });
+
   test("Should retrieve places when querying with valid user id", async () => {
     const response = await request(app)
       .get(`/api/places/user/${user1._id}`)
