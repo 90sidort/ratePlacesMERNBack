@@ -1,6 +1,4 @@
 const request = require("supertest");
-const mongoose = require("mongoose");
-const jwt = require("jsonwebtoken");
 
 const app = require("../../app");
 
@@ -8,19 +6,11 @@ const User = require("../../models/user.model");
 const { userOne, userTwo } = require("../fixtures/users.fixture");
 
 describe("User create tests", () => {
-  let user1;
   let user2;
-  let token2;
 
   beforeAll(async () => {
     await User.deleteMany();
-    // user1 = await new User(userOne).save();
     user2 = await new User(userTwo).save();
-    // token2 = jwt.sign(
-    //   { userId: user2.id, email: user2.email },
-    //   process.env.JWT_SECRET,
-    //   { expiresIn: "1h" }
-    // );
   });
 
   afterAll(async () => {
