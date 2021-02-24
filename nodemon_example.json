@@ -1,0 +1,8 @@
+{
+    "env": {
+        "GEOCODE_API": "PROVIDE_YOUR GEOCODE_API",
+        "PORT":"5000",
+        "MONGO_URI": "PLEASE_PROVIDE_YOUR_OWN",
+        "JWT_SECRET": "this_is_the_number_2137"
+    }
+}

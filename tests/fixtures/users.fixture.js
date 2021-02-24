@@ -20,4 +20,55 @@ const userTwo = {
   about: "I am a test user number two m8!",
 };
 
-module.exports = { userOne, userTwo };
+const longString = `This is a changed about section.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.
+But it is way too long.`;
+
+module.exports = { userOne, userTwo, longString };

@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 const app = require("../../app");
 
 const User = require("../../models/user.model");
-const { userOne, userTwo } = require("../fixtures/users.fixture");
+const { userOne, userTwo, longString } = require("../fixtures/users.fixture");
 
 describe("User update tests", () => {
   let user1;
@@ -126,22 +126,13 @@ describe("User update tests", () => {
       .send({
         name: "",
         email: "changedTest",
-        about: `This is a changed about section.
-          But it is way too long.
-          But it is way too long.
-          But it is way too long.
-          But it is way too long.
-          But it is way too long.
-          But it is way too long.
-          But it is way too long.
-          But it is way too long.
-          But it is way too long.`,
+        about: longString,
       })
       .set("Authorization", `Bearer ${token2}`)
       .expect(422);
 
     expect(response.body.message).toEqual(
-      "NAME: Requires at least 1 chars and max 100 chars\nEMAIL: Requires valid email\nABOUT: 150 chars max!\n"
+      "NAME: Requires at least 1 chars and max 100 chars\nEMAIL: Requires valid email\nABOUT: 1000 chars max!\n"
     );
   });
 });

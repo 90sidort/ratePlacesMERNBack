@@ -12,9 +12,9 @@ const validateUser = [
   body("about")
     .trim()
     .isLength({
-      max: 150,
+      max: 1000,
     })
-    .withMessage("150 chars max!"),
+    .withMessage("1000 chars max!"),
   body("password")
     .trim()
     .isLength({
@@ -36,9 +36,9 @@ const validateUserUpdate = [
   body("about")
     .trim()
     .isLength({
-      max: 150,
+      max: 1000,
     })
-    .withMessage("150 chars max!"),
+    .withMessage("1000 chars max!"),
 ];
 
 module.exports = { validateUser, validateUserUpdate };
