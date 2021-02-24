@@ -1,42 +1,27 @@
 const { body } = require("express-validator");
 
 const validateUser = [
-  body("title")
+  body("name")
     .trim()
     .isLength({
       min: 1,
-      max: 300,
+      max: 100,
     })
-    .withMessage("Cannot be shorter than 1 and longer than 300 characters"),
+    .withMessage("Requires at least 1 chars and max 100 chars"),
+  body("email").trim().isEmail().withMessage("Requires valid email"),
   body("about")
     .trim()
     .isLength({
-      min: 5,
-      max: 1000,
+      max: 150,
     })
-    .withMessage("Cannot be longer than 1000"),
-  body("address")
+    .withMessage("150 chars max!"),
+  body("password")
     .trim()
     .isLength({
-      min: 1,
-      max: 300,
+      min: 6,
+      max: 16,
     })
-    .withMessage("Cannot be shorter than 1 and longer than 300 characters"),
-  body("description")
-    .trim()
-    .isLength({
-      max: 6000,
-    })
-    .withMessage("Cannot be longer than 6000 characters"),
-  body("type")
-    .trim()
-    .isLength({
-      min: 1,
-    })
-    .isIn(["monument", "site", "event", "other"])
-    .withMessage(
-      "Cannot be shorter than 1 character and has to be monument /site /event /other"
-    ),
+    .withMessage("Requires at least 6 chars and max 16 chars"),
 ];
 
 module.exports = validateUser;

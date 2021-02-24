@@ -1,0 +1,84 @@
+const request = require("supertest");
+const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
+
+const app = require("../../app");
+
+const User = require("../../models/user.model");
+const { userOne, userTwo } = require("../fixtures/users.fixture");
+
+describe("User update tests", () => {
+  let user1;
+  let user2;
+  let token2;
+
+  beforeAll(async () => {
+    await User.deleteMany();
+    user1 = await new User(userOne).save();
+    user2 = await new User(userTwo).save();
+    token2 = jwt.sign(
+      { userId: user2.id, email: user2.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+  });
+
+  afterAll(async () => {
+    await User.deleteMany();
+  });
+
+  test("Should be able to follow user", async () => {
+    const response = await request(app)
+      .put(`/api/users/follow/${user1._id}`)
+      .set("Authorization", `Bearer ${token2}`)
+      .expect(201);
+
+    expect(response.body.follow.length).toEqual(1);
+    expect(response.body.followed).toEqual(1);
+  });
+
+  test("Should not be able to follow user that you are already following", async () => {
+    const response = await request(app)
+      .put(`/api/users/follow/${user1._id}`)
+      .set("Authorization", `Bearer ${token2}`)
+      .expect(400);
+
+    expect(response.body.message).toEqual("Already following this user.");
+  });
+
+  test("Should be able to unfollow user", async () => {
+    const response = await request(app)
+      .put(`/api/users/unfollow/${user1._id}`)
+      .set("Authorization", `Bearer ${token2}`)
+      .expect(201);
+
+    expect(response.body.follow.length).toEqual(0);
+    expect(response.body.followed).toEqual(0);
+  });
+
+  test("Should notify when user/s doesn't/don't exist", async () => {
+    const response = await request(app)
+      .put(`/api/users/follow/${new mongoose.Types.ObjectId()}`)
+      .set("Authorization", `Bearer ${token2}`)
+      .expect(400);
+
+    expect(response.body.message).toEqual("Unable to find users.");
+  });
+
+  test("Should not be able to follow oneself", async () => {
+    const response = await request(app)
+      .put(`/api/users/follow/${user2._id}`)
+      .set("Authorization", `Bearer ${token2}`)
+      .expect(400);
+
+    expect(response.body.message).toEqual("Cannot follow yourself.");
+  });
+
+  test("Should be able to update user details", async () => {
+    const response = await request(app)
+      .put(`/api/users/${user2._id}`)
+      .send({})
+      .set("Authorization", `Bearer ${token2}`)
+      .expect(201);
+  });
+});

@@ -115,6 +115,9 @@ const login = async (req, res, next) => {
 
 const followUser = async (req, res, next) => {
   try {
+    if (req.userData.userId.toString() === req.params.uid.toString()) {
+      return next(new HttpError("Cannot follow yourself.", 400));
+    }
     const follower = await User.findById(req.userData.userId);
     const followed = await User.findById(req.params.uid);
     if (follower && followed) {
