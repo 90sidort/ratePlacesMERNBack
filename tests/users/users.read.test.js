@@ -4,7 +4,7 @@ const request = require("supertest");
 const app = require("../../app");
 
 const User = require("../../models/user.model");
-const { userOne, userTwo } = require("../fixtures/users.fixture");
+const { userOne, userTwo, userThree } = require("../fixtures/users.fixture");
 
 describe("User read tests", () => {
   let user1;
@@ -60,5 +60,12 @@ describe("User read tests", () => {
       name: "Test User",
       image: "placeholder",
     });
+  });
+
+  test("Should be able to get users by popularity", async () => {
+    await new User(userThree).save();
+    const response = await request(app).get(`/api/users/popular`).expect(200);
+
+    expect(response.body.users[0].name).toEqual("Tester Three");
   });
 });

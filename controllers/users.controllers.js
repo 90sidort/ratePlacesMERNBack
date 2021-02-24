@@ -45,6 +45,31 @@ const getUser = async (req, res, next) => {
   }
 };
 
+const getPopular = async (req, res, next) => {
+  try {
+    const users = await User.aggregate([
+      {
+        $project: {
+          name: 1,
+          email: 1,
+          about: 1,
+          image: 1,
+          places: 1,
+          following: 1,
+          followers: 1,
+          about: 1,
+          length: { $size: "$followers" },
+        },
+      },
+      { $sort: { length: -1 } },
+      { $limit: 5 },
+    ]);
+    return res.status(200).json({ users });
+  } catch (e) {
+    return next(new HttpError("Server error.", 500));
+  }
+};
+
 const signup = async (req, res, next) => {
   const { errors } = validationResult(req);
   if (errors.length > 0) {
@@ -208,7 +233,6 @@ const updateUser = async (req, res, next) => {
       return res.status(200).json({ user: user.toObject({ getters: true }) });
     }
   } catch (e) {
-    console.log(e);
     return next(new HttpError("Server error.", 500));
   }
 };
@@ -222,4 +246,5 @@ module.exports = {
   unfollowUser,
   getUsers,
   updateUser,
+  getPopular,
 };

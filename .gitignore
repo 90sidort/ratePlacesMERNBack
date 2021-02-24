@@ -1,3 +1,4 @@
 /node_modules
 /config.js
 /nodemon.json
+.env

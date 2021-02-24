@@ -58,7 +58,6 @@ const getMostPopular = async (req, res, next) => {
 
     return res.status(200).send({ places });
   } catch (e) {
-    console.log(e);
     return next(new HttpError("Server error.", 500));
   }
 };

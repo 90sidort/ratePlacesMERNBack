@@ -11,6 +11,7 @@ const {
   unfollowUser,
   getUsers,
   updateUser,
+  getPopular,
 } = require("../controllers/users.controllers");
 
 const {
@@ -21,6 +22,8 @@ const {
 const userRouters = express.Router();
 
 userRouters.get("/", getUsersList);
+
+userRouters.get(`/popular`, getPopular);
 
 userRouters.get("/:uid", getUser);
 
