@@ -13,7 +13,10 @@ const {
   updateUser,
 } = require("../controllers/users.controllers");
 
-const validateUser = require("../validators/user.validator");
+const {
+  validateUser,
+  validateUserUpdate,
+} = require("../validators/user.validator");
 
 const userRouters = express.Router();
 
@@ -33,7 +36,7 @@ userRouters.patch(
   "/:uid",
   requireLogin,
   fileUpload.single("image"),
-  validateUser,
+  validateUserUpdate,
   updateUser
 );
 

@@ -48,7 +48,11 @@ const getUser = async (req, res, next) => {
 const signup = async (req, res, next) => {
   const { errors } = validationResult(req);
   if (errors.length > 0) {
-    return next(new HttpError("Invalid inputes, please check your data.", 404));
+    let errorMessage = "";
+    await errors.forEach((e) => {
+      errorMessage = errorMessage + `${e.param.toUpperCase()}: ${e.msg}` + "\n";
+    });
+    return next(new HttpError(errorMessage, 422));
   }
   const { name, password, email } = req.body;
   try {
@@ -176,7 +180,11 @@ const unfollowUser = async (req, res, next) => {
 const updateUser = async (req, res, next) => {
   const { errors } = validationResult(req);
   if (errors.length > 0) {
-    return next(new HttpError("Invalid inputs, please check your data.", 422));
+    let errorMessage = "";
+    await errors.forEach((e) => {
+      errorMessage = errorMessage + `${e.param.toUpperCase()}: ${e.msg}` + "\n";
+    });
+    return next(new HttpError(errorMessage, 422));
   }
   const { name, about, email } = await req.body;
   try {
@@ -200,6 +208,7 @@ const updateUser = async (req, res, next) => {
       return res.status(200).json({ user: user.toObject({ getters: true }) });
     }
   } catch (e) {
+    console.log(e);
     return next(new HttpError("Server error.", 500));
   }
 };

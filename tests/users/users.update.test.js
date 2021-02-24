@@ -76,9 +76,72 @@ describe("User update tests", () => {
 
   test("Should be able to update user details", async () => {
     const response = await request(app)
-      .put(`/api/users/${user2._id}`)
-      .send({})
+      .patch(`/api/users/${user2._id}`)
+      .send({
+        name: "ChangedNameUser",
+        email: "changedTest@test.com",
+        about: "This is a changed about section.",
+      })
       .set("Authorization", `Bearer ${token2}`)
-      .expect(201);
+      .expect(200);
+    expect(response.body.user).toEqual({
+      about: "This is a changed about section.",
+      name: "ChangedNameUser",
+      email: "changedTest@test.com",
+      image: "placeholder",
+      id: expect.any(String),
+      _id: expect.any(String),
+    });
+  });
+
+  test("Should notify if user does not exist (update)", async () => {
+    const response = await request(app)
+      .patch(`/api/users/${new mongoose.Types.ObjectId()}`)
+      .send({
+        name: "ChangedNameUser",
+        email: "changedTest@test.com",
+        about: "This is a changed about section.",
+      })
+      .set("Authorization", `Bearer ${token2}`)
+      .expect(404);
+    expect(response.body.message).toEqual("User with this id does not exist.");
+  });
+
+  test("Should not be able to update other users", async () => {
+    const response = await request(app)
+      .patch(`/api/users/${user1._id}`)
+      .send({
+        name: "ChangedNameUser",
+        email: "changedTest@test.com",
+        about: "This is a changed about section.",
+      })
+      .set("Authorization", `Bearer ${token2}`)
+      .expect(401);
+    expect(response.body.message).toEqual("Authorization error.");
+  });
+
+  test("Should be impossible to update user details with invalid data", async () => {
+    const response = await request(app)
+      .patch(`/api/users/${user2._id}`)
+      .send({
+        name: "",
+        email: "changedTest",
+        about: `This is a changed about section.
+          But it is way too long.
+          But it is way too long.
+          But it is way too long.
+          But it is way too long.
+          But it is way too long.
+          But it is way too long.
+          But it is way too long.
+          But it is way too long.
+          But it is way too long.`,
+      })
+      .set("Authorization", `Bearer ${token2}`)
+      .expect(422);
+
+    expect(response.body.message).toEqual(
+      "NAME: Requires at least 1 chars and max 100 chars\nEMAIL: Requires valid email\nABOUT: 150 chars max!\n"
+    );
   });
 });
