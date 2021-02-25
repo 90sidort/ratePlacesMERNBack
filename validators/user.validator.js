@@ -4,11 +4,18 @@ const validateUser = [
   body("name")
     .trim()
     .isLength({
+      min: 5,
+      max: 100,
+    })
+    .withMessage("Requires at least 5 chars and max 100 chars"),
+  body("email")
+    .trim()
+    .isEmail()
+    .isLength({
       min: 1,
       max: 100,
     })
-    .withMessage("Requires at least 1 chars and max 100 chars"),
-  body("email").trim().isEmail().withMessage("Requires valid email"),
+    .withMessage("Requires valid email"),
   body("about")
     .trim()
     .isLength({

@@ -50,7 +50,7 @@ describe("User create tests", () => {
       .expect(422);
 
     expect(response.body.message).toEqual(
-      "NAME: Requires at least 1 chars and max 100 chars\nEMAIL: Requires valid email\nPASSWORD: Requires at least 6 chars and max 16 chars\n"
+      "NAME: Requires at least 5 chars and max 100 chars\nEMAIL: Invalid value\nPASSWORD: Requires at least 6 chars and max 16 chars\n"
     );
   });
 });
