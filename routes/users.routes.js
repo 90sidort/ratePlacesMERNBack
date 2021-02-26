@@ -12,6 +12,7 @@ const {
   getUsers,
   updateUser,
   getPopular,
+  archiveUser,
 } = require("../controllers/users.controllers");
 
 const {
@@ -44,5 +45,7 @@ userRouters.patch(
 );
 
 userRouters.post("/login", login);
+
+userRouters.patch("/archive/:uid", requireLogin, archiveUser);
 
 module.exports = userRouters;

@@ -15,6 +15,7 @@ const userSchema = new Schema({
     type: String,
     default: "Hi, maybe you'll tell us a bit about yourself",
   },
+  archived: { type: Boolean, required: true, default: false },
 });
 
 userSchema.plugin(mongooseValidator);

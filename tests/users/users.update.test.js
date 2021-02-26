@@ -135,4 +135,13 @@ describe("User update tests", () => {
       "NAME: Requires at least 1 chars and max 100 chars\nEMAIL: Requires valid email\nABOUT: 1000 chars max!\n"
     );
   });
+
+  test("Should be able to archive an account", async () => {
+    const response = await request(app)
+      .patch(`/api/users/archive/${user2._id}`)
+      .set("Authorization", `Bearer ${token2}`);
+
+    expect(response.body.user.archived).toEqual(true);
+    expect(response.body.user.name).toEqual("ChangedNameUser (Archived)");
+  });
 });

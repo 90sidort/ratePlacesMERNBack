@@ -116,6 +116,8 @@ const login = async (req, res, next) => {
     const existingUser = await User.findOne({ email });
     if (!existingUser) {
       return next(new HttpError("User does not exists.", 403));
+    } else if (existingUser.archived === true) {
+      return next(new HttpError("This account has been archived.", 403));
     } else {
       const isValidPassword = await bcrypt.compare(
         password,
@@ -237,6 +239,26 @@ const updateUser = async (req, res, next) => {
   }
 };
 
+const archiveUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.userData.userId, "-password");
+    if (!user) {
+      return next(new HttpError("User not found.", 500));
+    } else if (user._id.toString() !== req.userData.userId) {
+      return next(
+        new HttpError("You cannot archive accounts of other users.", 500)
+      );
+    } else {
+      user.archived = true;
+      user.name = `${user.name} (Archived)`;
+      user.save();
+      return res.status(200).json({ user: user.toObject({ getters: true }) });
+    }
+  } catch (e) {
+    return next(new HttpError("Server error, try again.", 500));
+  }
+};
+
 module.exports = {
   getUsersList,
   getUser,
@@ -247,4 +269,5 @@ module.exports = {
   getUsers,
   updateUser,
   getPopular,
+  archiveUser,
 };
